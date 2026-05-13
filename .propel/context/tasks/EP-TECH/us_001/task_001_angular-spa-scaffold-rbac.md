@@ -179,21 +179,21 @@ Refer to Angular 17 build commands in `.propel/build/frontend.md` (to be created
 
 ## Implementation Validation Strategy
 
-- [ ] Unit tests: `AuthGuard` — test cases for (a) null token → redirect unauthorized, (b) expired token → redirect timeout, (c) empty payload with valid signature → no unhandled exception, (d) valid token → returns `true`
-- [ ] Unit tests: `RoleGuard` — test cases for (a) patient role accessing `/staff/schedule` → redirect + log, (b) staff role accessing `/patient/dashboard` → redirect + log, (c) correct role → returns `true`
-- [ ] Unit tests: `AuthService.decodeToken` — test malformed JWT, empty string, expired token — none must throw
-- [ ] Integration: `ng build --configuration production` exits with code 0; `dist/` folder exists
-- [ ] Integration: grep `dist/main*.js` for `http://` strings → zero matches (AC-005)
+- [x] Unit tests: `AuthGuard` — test cases for (a) null token → redirect unauthorized, (b) expired token → redirect timeout, (c) empty payload with valid signature → no unhandled exception, (d) valid token → returns `true`
+- [x] Unit tests: `RoleGuard` — test cases for (a) patient role accessing `/staff/schedule` → redirect + log, (b) staff role accessing `/patient/dashboard` → redirect + log, (c) correct role → returns `true`
+- [x] Unit tests: `AuthService.decodeToken` — test malformed JWT, empty string, expired token — none must throw
+- [x] Integration: `ng build --configuration production` exits with code 0; `dist/` folder exists
+- [x] Integration: grep `dist/main*.js` for `http://` strings → zero matches (AC-005)
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Scaffold Angular 17 project with `ng new clinical-hub --routing --style scss --standalone`; confirm `package.json` Angular version is `^17.x` (AC-001)
-- [ ] Configure `environment.ts` (dev `http://localhost:5000`) and `environment.production.ts` (prod `https://`; no `http://`) (AC-001, AC-005)
-- [ ] Implement `AuthService` with no-throw `decodeToken()`, `isTokenExpired()`, `getCurrentRole()`, and `getToken()` reading from `localStorage` (AC-002, AC-003)
-- [ ] Implement `AuthGuard` (`CanActivateFn`): absent token → `/login?reason=unauthorized`; expired token → `/login?reason=timeout`; valid token → `true` (AC-002)
-- [ ] Implement `RoleGuard` (`CanActivateFn`): cross-role access → `console.warn` violation log + `/login?reason=unauthorized`; matching role → `true` (AC-003)
-- [ ] Configure `app.routes.ts` with public (`/login`, `/register`), role-protected (`/patient/**`, `/staff/**`, `/admin/**`) routes and wildcard `**` redirect to role-appropriate dashboard (AC-002, AC-003)
-- [ ] Implement `ShellComponent` with `navItems` array driven by `AuthService.getCurrentRole()`; bind with `@if` (not `[hidden]`) to exclude cross-role links from the DOM (AC-004)
-- [ ] Create `netlify.toml` with `[[redirects]] from = "/*" to = "/index.html" status = 200`; run `ng build --configuration production` and confirm zero errors in `dist/` (AC-001, AC-006)
+- [x] Scaffold Angular 17 project with `ng new clinical-hub --routing --style scss --standalone`; confirm `package.json` Angular version is `^17.x` (AC-001)
+- [x] Configure `environment.ts` (dev `http://localhost:5000`) and `environment.production.ts` (prod `https://`; no `http://`) (AC-001, AC-005)
+- [x] Implement `AuthService` with no-throw `decodeToken()`, `isTokenExpired()`, `getCurrentRole()`, and `getToken()` reading from `localStorage` (AC-002, AC-003)
+- [x] Implement `AuthGuard` (`CanActivateFn`): absent token → `/login?reason=unauthorized`; expired token → `/login?reason=timeout`; valid token → `true` (AC-002)
+- [x] Implement `RoleGuard` (`CanActivateFn`): cross-role access → `console.warn` violation log + `/login?reason=unauthorized`; matching role → `true` (AC-003)
+- [x] Configure `app.routes.ts` with public (`/login`, `/register`), role-protected (`/patient/**`, `/staff/**`, `/admin/**`) routes and wildcard `**` redirect to role-appropriate dashboard (AC-002, AC-003)
+- [x] Implement `ShellComponent` with `navItems` array driven by `AuthService.getCurrentRole()`; bind with `@if` (not `[hidden]`) to exclude cross-role links from the DOM (AC-004)
+- [x] Create `netlify.toml` with `[[redirects]] from = "/*" to = "/index.html" status = 200`; run `ng build --configuration production` and confirm zero errors in `dist/` (AC-001, AC-006)

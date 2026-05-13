@@ -148,11 +148,11 @@ dotnet run --project src/ClinicalHealthcare.Api
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `MapHealthChecks("/health")` registered; returns 200 `{"status":"Healthy"}`
-- [ ] **[AC-002]** Swagger registered and served only when `IsDevelopment()` is true
-- [ ] **[AC-003]** `ValidateOnBuild = true` configured; unresolvable services fail startup
-- [ ] **[AC-004]** `Features/` directories created for all 8 planned feature areas
-- [ ] **[AC-005]** `IEndpointDefinition` interface + assembly-scan extension replace top-level MVC controllers
-- [ ] Build passes with `dotnet build` (0 errors)
-- [ ] `/health` curl smoke-test passes locally
-- [ ] Solution file created and references the API project
+- [x] **[AC-001]** `MapHealthChecks("/health")` registered; returns 200 `{"status":"Healthy"}`
+- [x] **[AC-002]** Swagger registered and served only when `IsDevelopment()` is true
+- [x] **[AC-003]** `ValidateOnBuild = true` configured; unresolvable services fail startup
+- [x] **[AC-004]** `Features/` directories created for all 8 planned feature areas
+- [x] **[AC-005]** `IEndpointDefinition` interface + assembly-scan extension replace top-level MVC controllers
+- [x] Build passes with `dotnet build` (0 errors)
+- [x] `/health` curl smoke-test passes locally
+- [x] Solution file created and references the API project

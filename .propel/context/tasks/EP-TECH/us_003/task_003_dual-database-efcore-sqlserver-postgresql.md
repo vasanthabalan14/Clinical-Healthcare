@@ -146,11 +146,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `ApplicationDbContext` created targeting SQL Server; conn string from env var
-- [ ] **[AC-002]** `ClinicalDbContext` created targeting PostgreSQL via Npgsql; conn string from env var
-- [ ] **[AC-003]** No cross-context transactions — separate project boundaries enforce isolation
-- [ ] **[AC-004]** Both contexts registered in DI; `ValidateOnBuild` confirms resolution
-- [ ] **[AC-005]** Separate migration projects created for SQL Server and PostgreSQL contexts
-- [ ] Missing env vars cause fast startup failure with descriptive error
-- [ ] `dotnet build` passes with 0 errors
-- [ ] `dotnet ef migrations add InitialCreate` succeeds for both contexts
+- [x] **[AC-001]** `ApplicationDbContext` created targeting SQL Server; conn string from env var
+- [x] **[AC-002]** `ClinicalDbContext` created targeting PostgreSQL via Npgsql; conn string from env var
+- [x] **[AC-003]** No cross-context transactions — separate project boundaries enforce isolation
+- [x] **[AC-004]** Both contexts registered in DI; `ValidateOnBuild` confirms resolution
+- [x] **[AC-005]** Separate migration projects created for SQL Server and PostgreSQL contexts
+- [x] Missing env vars cause fast startup failure with descriptive error
+- [x] `dotnet build` passes with 0 errors
+- [x] `dotnet ef migrations add InitialCreate` succeeds for both contexts
