@@ -143,11 +143,11 @@ dotnet publish src/ClinicalHealthcare.Api -c Release -o publish/api
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `netlify.toml` `[[redirects]]` SPA fallback rule present
-- [ ] **[AC-002]** `web.config` generated with `hostingModel="inprocess"` for IIS
-- [ ] **[AC-003]** `UseWindowsService()` called in `Program.cs`
-- [ ] **[AC-004]** `UseHttpsRedirection()` in middleware; IIS TLS steps documented in runbook
-- [ ] **[AC-005]** No literal secrets in any committed config file; `.gitignore` covers local overrides
-- [ ] `dotnet publish` output contains `web.config`
-- [ ] `docs/deployment-runbook.md` created with IIS + Windows Service steps
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `netlify.toml` `[[redirects]]` SPA fallback rule present
+- [x] **[AC-002]** `web.config` generated with `hostingModel="inprocess"` for IIS
+- [x] **[AC-003]** `UseWindowsService()` called in `Program.cs`
+- [x] **[AC-004]** `UseHttpsRedirection()` in middleware; IIS TLS steps documented in runbook
+- [x] **[AC-005]** No literal secrets in any committed config file; `.gitignore` covers local overrides
+- [x] `dotnet publish` output contains `web.config`
+- [x] `docs/deployment-runbook.md` created with IIS + Windows Service steps
+- [x] `dotnet build` passes with 0 errors

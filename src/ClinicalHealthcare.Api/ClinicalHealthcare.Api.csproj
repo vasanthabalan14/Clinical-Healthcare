@@ -9,6 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.*" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.*" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="6.*" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
   </ItemGroup>
 
@@ -16,6 +20,12 @@
   <ItemGroup>
     <None Update="Features/**/*.md" CopyToOutputDirectory="Never" />
   </ItemGroup>
+
+  <!-- Ensure web.config is always present in the publish output for IIS hosting -->
+  <ItemGroup>
+    <Content Update="web.config" CopyToPublishDirectory="Always" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ClinicalHealthcare.Infrastructure\ClinicalHealthcare.Infrastructure.csproj" />
   </ItemGroup>

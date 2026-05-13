@@ -2,15 +2,50 @@ using System.Net.Mime;
 using System.Text.Json;
 using ClinicalHealthcare.Api.Abstractions;
 using ClinicalHealthcare.Api.Infrastructure;
+using ClinicalHealthcare.Api.Middleware;
 using ClinicalHealthcare.Infrastructure.Cache;
 using ClinicalHealthcare.Infrastructure.Data;
+using ClinicalHealthcare.Infrastructure.Logging;
 using Hangfire;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Serilog;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ── Windows Service hosting support (AC-003) ─────────────────────────────
+// No-op on non-Windows and non-service environments; safe to leave unconditional.
+builder.Host.UseWindowsService();
+
+// ── Serilog — structured logging with file + Seq CE sinks (AC-001/AC-004) ──
+var seqServerUrl = Environment.GetEnvironmentVariable("SEQ_SERVER_URL");
+
+if (string.IsNullOrWhiteSpace(seqServerUrl))
+{
+    // Non-fatal: app runs without Seq, but operators must investigate.
+    Console.WriteLine("[WARNING] SEQ_SERVER_URL is not set. Structured logs will route to localhost:5341 only.");
+}
+
+builder.Host.UseSerilog((ctx, services, config) =>
+{
+    config
+        .ReadFrom.Configuration(ctx.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.With<PhiRedactingEnricher>()
+        .Destructure.With<PhiRedactingDestructuringPolicy>()
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: "logs/clinical-hub-.log",
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {CorrelationId} {Message:lj}{NewLine}{Exception}")
+        .WriteTo.Seq(
+            serverUrl: seqServerUrl ?? "http://localhost:5341",
+            apiKey: Environment.GetEnvironmentVariable("SEQ_API_KEY"));
+});
 
 // ── Fail-fast: require both connection strings at startup (AC-001/AC-002) ──
 static string RequireConnectionString(string envVar) =>
@@ -101,6 +136,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
+
+// ── Correlation ID propagation + Serilog request logging (AC-002) ───────────
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging();
 
 // ── Hangfire Dashboard — admin role only (AC-004) ────────────────────────────
 app.UseHangfireDashboard("/hangfire", new DashboardOptions

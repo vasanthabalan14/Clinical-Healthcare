@@ -144,11 +144,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** Serilog file sink (30-day rolling) and Seq CE sink configured
-- [ ] **[AC-002]** `CorrelationIdMiddleware` generates/propagates `X-Correlation-ID`; enriches log context
-- [ ] **[AC-003]** `PhiRedactingDestructuringPolicy` redacts known PHI property names to `[REDACTED]`
-- [ ] **[AC-004]** Seq URL read from `SEQ_SERVER_URL` env var; documented in runbook
-- [ ] **[AC-005]** `audit-oss-licences.ps1` validates NuGet licences; CI step fails on violation
-- [ ] `CorrelationIdMiddleware` registered before `UseSerilogRequestLogging()`
-- [ ] PHI property list covers: Email, DateOfBirth, PhoneNumber, FirstName, LastName, Address, SSN
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** Serilog file sink (30-day rolling) and Seq CE sink configured
+- [x] **[AC-002]** `CorrelationIdMiddleware` generates/propagates `X-Correlation-ID`; enriches log context
+- [x] **[AC-003]** `PhiRedactingDestructuringPolicy` redacts known PHI property names to `[REDACTED]`
+- [x] **[AC-004]** Seq URL read from `SEQ_SERVER_URL` env var; documented in runbook
+- [x] **[AC-005]** `audit-oss-licences.ps1` validates NuGet licences; CI step fails on violation
+- [x] `CorrelationIdMiddleware` registered before `UseSerilogRequestLogging()`
+- [x] PHI property list covers: Email, DateOfBirth, PhoneNumber, FirstName, LastName, Address, SSN
+- [x] `dotnet build` passes with 0 errors
