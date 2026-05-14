@@ -12,8 +12,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserAccount>   UserAccounts   => Set<UserAccount>();
     public DbSet<Slot>          Slots          => Set<Slot>();
     public DbSet<Appointment>   Appointments   => Set<Appointment>();
-    public DbSet<WaitlistEntry> WaitlistEntries => Set<WaitlistEntry>();
-    public DbSet<IntakeRecord>  IntakeRecords  => Set<IntakeRecord>();
+    public DbSet<WaitlistEntry>    WaitlistEntries    => Set<WaitlistEntry>();
+    public DbSet<IntakeRecord>     IntakeRecords     => Set<IntakeRecord>();
+    public DbSet<ClinicalDocument> ClinicalDocuments => Set<ClinicalDocument>();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
@@ -119,6 +120,44 @@ public class ApplicationDbContext : DbContext
             // AC-004 — default query filter: normal queries return only the latest version
             // Use .IgnoreQueryFilters() to access full version history
             e.HasQueryFilter(r => r.IsLatest);
+        });
+
+        // ── ClinicalDocument ─────────────────────────────────────────────────
+        modelBuilder.Entity<ClinicalDocument>(e =>
+        {
+            e.HasKey(d => d.Id);
+
+            // AC-001 — EncryptedBlobPath as nvarchar(500); binary content NEVER stored in DB
+            e.Property(d => d.OriginalFileName).HasMaxLength(500).IsRequired();
+            e.Property(d => d.EncryptedBlobPath).HasColumnType("nvarchar(500)").IsRequired();
+
+            // AC-002 — VirusScanResult defaults to Pending (0) at the database column level
+            e.Property(d => d.VirusScanResult)
+             .HasConversion<int>()
+             .HasDefaultValue(VirusScanResult.Pending)
+             .IsRequired();
+
+            e.Property(d => d.OcrStatus)
+             .HasConversion<int>()
+             .HasDefaultValue(OcrStatus.Pending)
+             .IsRequired();
+
+            e.HasOne(d => d.Patient)
+             .WithMany()
+             .HasForeignKey(d => d.PatientId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(d => d.UploadedByStaff)
+             .WithMany()
+             .HasForeignKey(d => d.UploadedByStaffId)
+             .OnDelete(DeleteBehavior.SetNull);
+
+            // AC-003 — non-clustered index on PatientId for efficient patient document queries
+            e.HasIndex(d => d.PatientId)
+             .HasDatabaseName("IX_ClinicalDocuments_PatientId");
+
+            // Optimistic concurrency — prevents lost updates from concurrent background workers
+            e.Property(d => d.RowVersion).IsRowVersion();
         });
     }
 }

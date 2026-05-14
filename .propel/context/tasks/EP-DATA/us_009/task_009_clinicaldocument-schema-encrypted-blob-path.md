@@ -133,11 +133,14 @@ dotnet ef database update --project src/ClinicalHealthcare.Infrastructure.SqlMig
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `ClinicalDocument` entity with `EncryptedBlobPath` as `nvarchar(500)` (no binary)
-- [ ] **[AC-002]** `VirusScanResult` defaults to `Pending (0)` at database column level
-- [ ] **[AC-003]** Non-clustered index on `PatientId` configured via fluent API
-- [ ] **[AC-004]** Migration created and applies cleanly
-- [ ] **[AC-005]** Entity registered in `ApplicationDbContext` with correct column type configuration
-- [ ] `OcrStatus` column present (Pending/Extracted/LowConfidence/NoData)
-- [ ] Binary document content never stored in DB
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `ClinicalDocument` entity with `EncryptedBlobPath` as `nvarchar(500)` (no binary)
+- [x] **[AC-002]** `VirusScanResult` defaults to `Pending (0)` at database column level
+- [x] **[AC-003]** Non-clustered index on `PatientId` configured via fluent API
+- [x] **[AC-004]** Migration created and applies cleanly
+- [x] **[AC-005]** Entity registered in `ApplicationDbContext` with correct column type configuration
+- [x] `OcrStatus` column present (Pending/Extracted/LowConfidence/NoData)
+- [x] Binary document content never stored in DB
+- [x] `dotnet build` passes with 0 errors- [x] **[F1]** `EncryptedBlobPath` setter guard — throws `ArgumentException` on null/whitespace
+- [x] **[F3]** `OcrStatus` transition tests (Extracted / LowConfidence / NoData)
+- [x] **[F4]** FK Restrict document count test added
+- [x] **[F5]** Removed dead `HasDefaultValueSql("GETUTCDATE()")` from fluent config
