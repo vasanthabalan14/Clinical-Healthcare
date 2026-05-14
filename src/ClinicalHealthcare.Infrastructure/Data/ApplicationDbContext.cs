@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<WaitlistEntry>    WaitlistEntries    => Set<WaitlistEntry>();
     public DbSet<IntakeRecord>     IntakeRecords     => Set<IntakeRecord>();
     public DbSet<ClinicalDocument> ClinicalDocuments => Set<ClinicalDocument>();
+    public DbSet<AuditLog>         AuditLogs         => Set<AuditLog>();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
@@ -117,11 +118,36 @@ public class ApplicationDbContext : DbContext
             e.HasIndex(r => new { r.IntakeGroupId, r.IsLatest })
              .HasDatabaseName("IX_IntakeRecords_GroupId_IsLatest");
 
-            // AC-004 — default query filter: normal queries return only the latest version
-            // Use .IgnoreQueryFilters() to access full version history
-            e.HasQueryFilter(r => r.IsLatest);
+            // AC-004 — default query filter: latest version only; soft-deleted records excluded.
+            // Use .IgnoreQueryFilters() to access full version history or soft-deleted records.
+            e.HasQueryFilter(r => r.IsLatest && !r.IsDeleted);
+        });
+        // ── UserAccount — PHI retention + soft-delete query filter ─────────
+        modelBuilder.Entity<UserAccount>(e =>
+        {
+            e.Property(u => u.IsDeleted).HasDefaultValue(false);
+            e.Property(u => u.RetainUntil).IsRequired(false);
+            // Soft-delete filter — use .IgnoreQueryFilters() for admin/audit access.
+            e.HasQueryFilter(u => !u.IsDeleted);
         });
 
+        // ── WaitlistEntry — PHI retention + soft-delete query filter ────────
+        modelBuilder.Entity<WaitlistEntry>(e =>
+        {
+            e.Property(w => w.IsDeleted).HasDefaultValue(false);
+            e.Property(w => w.RetainUntil).IsRequired(false);
+            // Soft-delete filter — use .IgnoreQueryFilters() for admin/audit access.
+            e.HasQueryFilter(w => !w.IsDeleted);
+        });
+
+        // ── IntakeRecord — PHI retention columns ──────────────────────────
+        modelBuilder.Entity<IntakeRecord>(e =>
+        {
+            e.Property(r => r.IsDeleted).HasDefaultValue(false);
+            e.Property(r => r.RetainUntil).IsRequired(false);
+            // HasQueryFilter for IsLatest is set above in the main IntakeRecord block.
+            // IsDeleted is incorporated into that composite filter: IsLatest && !IsDeleted.
+        });
         // ── ClinicalDocument ─────────────────────────────────────────────────
         modelBuilder.Entity<ClinicalDocument>(e =>
         {
@@ -158,6 +184,72 @@ public class ApplicationDbContext : DbContext
 
             // Optimistic concurrency — prevents lost updates from concurrent background workers
             e.Property(d => d.RowVersion).IsRowVersion();
+
+            // PHI retention columns + soft-delete query filter
+            e.Property(d => d.IsDeleted).HasDefaultValue(false);
+            e.Property(d => d.RetainUntil).IsRequired(false);
+            // Soft-delete filter — use .IgnoreQueryFilters() for admin/audit access.
+            e.HasQueryFilter(d => !d.IsDeleted);
+        });
+
+        // ── AuditLog (AC-001) ─────────────────────────────────────────────
+        modelBuilder.Entity<AuditLog>(e =>
+        {
+            e.HasKey(a => a.Id);
+            e.Property(a => a.EntityType).HasMaxLength(128).IsRequired();
+            e.Property(a => a.Action).HasMaxLength(64).IsRequired();
+            e.Property(a => a.BeforeValue).HasColumnType("nvarchar(max)");
+            e.Property(a => a.AfterValue).HasColumnType("nvarchar(max)");
+            e.Property(a => a.OccurredAt).HasDefaultValueSql("GETUTCDATE()");
+            e.Property(a => a.CorrelationId).HasMaxLength(128);
+
+            // Logical references only — no FK constraints so audit records outlive
+            // the entities they reference (OWASP A09: security logging must not be lossy).
+
+            // Composite index: look up all audits for a given entity by type + id
+            e.HasIndex(a => new { a.EntityType, a.EntityId })
+             .HasDatabaseName("IX_AuditLogs_EntityType_EntityId");
+
+            // Index for time-range audit queries
+            e.HasIndex(a => a.OccurredAt)
+             .HasDatabaseName("IX_AuditLogs_OccurredAt");
         });
     }
+
+    // ── AC-003: PHI soft-delete intercept ──────────────────────────────────
+
+    /// <summary>
+    /// Converts hard-delete operations on PHI entities to soft-deletes.
+    /// Sets <c>IsDeleted = true</c> and <c>RetainUntil = UtcNow + 7 years</c>,
+    /// then changes the entry state to <c>Modified</c> so no row is removed.
+    /// Non-PHI entities (Slot, Appointment) proceed to hard-delete normally.
+    /// </summary>
+    public override int SaveChanges()
+    {
+        InterceptPhiDeletes();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        InterceptPhiDeletes();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void InterceptPhiDeletes()
+    {
+        var deletedPhi = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Deleted && IsPhiEntity(e.Entity))
+            .ToList();
+
+        foreach (var entry in deletedPhi)
+        {
+            entry.State = EntityState.Modified;
+            entry.CurrentValues[nameof(UserAccount.IsDeleted)]   = true;
+            entry.CurrentValues[nameof(UserAccount.RetainUntil)] = DateTimeOffset.UtcNow.AddYears(7);
+        }
+    }
+
+    private static bool IsPhiEntity(object entity) =>
+        entity is UserAccount or IntakeRecord or ClinicalDocument or WaitlistEntry;
 }

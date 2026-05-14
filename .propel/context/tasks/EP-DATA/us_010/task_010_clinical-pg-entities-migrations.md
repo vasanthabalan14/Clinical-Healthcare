@@ -134,11 +134,11 @@ dotnet ef database update --project src/ClinicalHealthcare.Infrastructure.PgMigr
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `ExtractedClinicalField` entity created and registered in `ClinicalDbContext`
-- [ ] **[AC-002]** `ConflictFlag` entity with `Unresolved/Resolved/Dismissed` status enum
-- [ ] **[AC-003]** `MedicalCodeSuggestion` entity with all required fields
-- [ ] **[AC-004]** Trust-First CHECK: `status != 'Accepted' OR verified_by IS NOT NULL`
-- [ ] **[AC-005]** `confidence_score CHECK (0.0 AND 1.0)` constraint configured
-- [ ] All three entities target PostgreSQL via `ClinicalDbContext`
-- [ ] Migration created and applies cleanly on PostgreSQL
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `ExtractedClinicalField` entity created and registered in `ClinicalDbContext`
+- [x] **[AC-002]** `ConflictFlag` entity with `Unresolved/Resolved/Dismissed` status enum
+- [x] **[AC-003]** `MedicalCodeSuggestion` entity with all required fields
+- [x] **[AC-004]** Trust-First CHECK: `"Status" != 1 OR "VerifiedById" IS NOT NULL`
+- [x] **[AC-005]** `confidence_score CHECK ("ConfidenceScore" >= 0.0 AND "ConfidenceScore" <= 1.0)` constraint configured
+- [x] All three entities target PostgreSQL via `ClinicalDbContext`
+- [x] Migration created and applies cleanly on PostgreSQL
+- [x] `dotnet build` passes with 0 errors

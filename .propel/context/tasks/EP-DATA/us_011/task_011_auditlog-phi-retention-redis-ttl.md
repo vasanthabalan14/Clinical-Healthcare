@@ -144,11 +144,11 @@ dotnet ef database update --project src/ClinicalHealthcare.Infrastructure.SqlMig
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `AuditLog` entity created; migration SQL revokes UPDATE/DELETE permissions
-- [ ] **[AC-002]** `IsDeleted` + `RetainUntil` added to all four PHI entities
-- [ ] **[AC-003]** `SaveChanges` override converts `EntityState.Deleted` on PHI entities to soft-delete
-- [ ] **[AC-004]** `CacheSettings` constants: 900/60/300 seconds
-- [ ] **[AC-005]** Migration `AuditLogPhiRetention` created and applies cleanly
-- [ ] `RetainUntil` set to `UtcNow.AddYears(7)` on soft-delete
-- [ ] Hard-delete on non-PHI entities (Slot, Appointment) proceeds normally
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `AuditLog` entity created; migration SQL revokes UPDATE/DELETE permissions
+- [x] **[AC-002]** `IsDeleted` + `RetainUntil` added to all four PHI entities
+- [x] **[AC-003]** `SaveChanges` override converts `EntityState.Deleted` on PHI entities to soft-delete
+- [x] **[AC-004]** `CacheSettings` constants: 900/60/300 seconds
+- [x] **[AC-005]** Migration `AuditLogPhiRetention` created and applies cleanly
+- [x] `RetainUntil` set to `UtcNow.AddYears(7)` on soft-delete
+- [x] Hard-delete on non-PHI entities (Slot, Appointment) proceeds normally
+- [x] `dotnet build` passes with 0 errors

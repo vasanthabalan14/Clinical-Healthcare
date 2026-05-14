@@ -19,4 +19,15 @@ public sealed class UserAccount
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // ── PHI retention (AC-002 / TASK_011) ────────────────────────────────────
+
+    /// <summary>Soft-delete flag. True means the account is pending retention expiry.</summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// Date after which the record may be purged under the PHI 7-year retention policy.
+    /// Null until the account is soft-deleted.
+    /// </summary>
+    public DateTimeOffset? RetainUntil { get; set; }
 }

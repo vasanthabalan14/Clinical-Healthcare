@@ -78,6 +78,17 @@ public sealed class ClinicalDocument
     [System.ComponentModel.DataAnnotations.Timestamp]
     public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
+    // ── PHI retention (AC-002 / TASK_011) ────────────────────────────────────
+
+    /// <summary>Soft-delete flag. True means the document is pending retention expiry.</summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// Date after which the record may be purged under the PHI 7-year retention policy.
+    /// Null until the document is soft-deleted.
+    /// </summary>
+    public DateTimeOffset? RetainUntil { get; set; }
+
     // Navigation properties
     public UserAccount? Patient { get; set; }
     public UserAccount? UploadedByStaff { get; set; }

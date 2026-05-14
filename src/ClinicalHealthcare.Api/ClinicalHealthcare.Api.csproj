@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ClinicalHealthcare.Infrastructure\ClinicalHealthcare.Infrastructure.csproj" />
     <ProjectReference Include="..\ClinicalHealthcare.Infrastructure.SqlMigrations\ClinicalHealthcare.Infrastructure.SqlMigrations.csproj" />
+    <ProjectReference Include="..\ClinicalHealthcare.Infrastructure.PgMigrations\ClinicalHealthcare.Infrastructure.PgMigrations.csproj" />
   </ItemGroup>
 
 </Project>

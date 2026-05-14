@@ -57,6 +57,17 @@ public sealed class IntakeRecord
     public string? Allergies       { get; set; }
     public string? MedicalHistory  { get; set; }
 
+    // ── PHI retention (AC-002 / TASK_011) ────────────────────────────────────
+
+    /// <summary>Soft-delete flag. True means the record is pending retention expiry.</summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// Date after which the record may be purged under the PHI 7-year retention policy.
+    /// Null until the record is soft-deleted.
+    /// </summary>
+    public DateTimeOffset? RetainUntil { get; set; }
+
     // Navigation property
     public UserAccount? Patient { get; set; }
 }
