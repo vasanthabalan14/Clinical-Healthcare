@@ -5,6 +5,7 @@ using ClinicalHealthcare.Api.Infrastructure;
 using ClinicalHealthcare.Api.Middleware;
 using ClinicalHealthcare.Infrastructure.Cache;
 using ClinicalHealthcare.Infrastructure.Data;
+using ClinicalHealthcare.Infrastructure.Interceptors;
 using ClinicalHealthcare.Infrastructure.Logging;
 using Hangfire;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -59,9 +60,14 @@ var postgresConnectionString  = RequireConnectionString("POSTGRES_CONNECTION_STR
 var redisConnectionString     = RequireConnectionString("REDIS_CONNECTION_STRING");
 
 // ── ApplicationDbContext — SQL Server (AC-001) ────────────────────────────
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(sqlServerConnectionString,
-        sql => sql.MigrationsAssembly("ClinicalHealthcare.Infrastructure.SqlMigrations")));
+// AppointmentFsmInterceptor is stateless — singleton lifetime is safe and avoids
+// per-request allocations. Registered here so future ctor injection is possible.
+builder.Services.AddSingleton<AppointmentFsmInterceptor>();
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+    options
+        .UseSqlServer(sqlServerConnectionString,
+            sql => sql.MigrationsAssembly("ClinicalHealthcare.Infrastructure.SqlMigrations"))
+        .AddInterceptors(sp.GetRequiredService<AppointmentFsmInterceptor>()));
 
 // ── ClinicalDbContext — PostgreSQL (AC-002) ───────────────────────────────
 builder.Services.AddDbContext<ClinicalDbContext>(options =>

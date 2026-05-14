@@ -13,6 +13,8 @@
 src/**/bin/
 src/**/obj/
 src/**/out/
+tests/**/bin/
+tests/**/obj/
 
 ## Visual Studio artefacts
 .vs/

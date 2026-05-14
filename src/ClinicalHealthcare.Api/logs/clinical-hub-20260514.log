@@ -1,0 +1,67 @@
+2026-05-14 11:48:25.102 +05:30 [INF]  Executed DbCommand (369ms) [Parameters=[], CommandType='"Text"', CommandTimeout='60']
+CREATE DATABASE [ClinicalHealthcare_Dev];
+2026-05-14 11:48:25.343 +05:30 [INF]  Executed DbCommand (174ms) [Parameters=[], CommandType='"Text"', CommandTimeout='60']
+IF SERVERPROPERTY('EngineEdition') <> 5
+BEGIN
+    ALTER DATABASE [ClinicalHealthcare_Dev] SET READ_COMMITTED_SNAPSHOT ON;
+END;
+2026-05-14 11:48:25.373 +05:30 [INF]  Executed DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-05-14 11:48:25.498 +05:30 [INF]  Executed DbCommand (18ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [__EFMigrationsHistory] (
+    [MigrationId] nvarchar(150) NOT NULL,
+    [ProductVersion] nvarchar(32) NOT NULL,
+    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+);
+2026-05-14 11:48:25.502 +05:30 [INF]  Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-05-14 11:48:25.533 +05:30 [INF]  Executed DbCommand (25ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2026-05-14 11:48:25.570 +05:30 [INF]  Executed DbCommand (32ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+2026-05-14 11:48:25.599 +05:30 [INF]  Applying migration '20260513164432_InitialCreate'.
+2026-05-14 11:48:25.631 +05:30 [INF]  Executed DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20260513164432_InitialCreate', N'8.0.27');
+2026-05-14 11:48:25.641 +05:30 [INF]  Applying migration '20260514061800_UserAccountSlotAppointment'.
+2026-05-14 11:48:25.696 +05:30 [INF]  Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Slots] (
+    [Id] int NOT NULL IDENTITY,
+    [SlotTime] datetime2 NOT NULL,
+    [DurationMinutes] int NOT NULL,
+    [IsAvailable] bit NOT NULL,
+    [RowVersion] rowversion NOT NULL,
+    CONSTRAINT [PK_Slots] PRIMARY KEY ([Id])
+);
+2026-05-14 11:48:25.705 +05:30 [INF]  Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [UserAccounts] (
+    [Id] int NOT NULL IDENTITY,
+    [Email] nvarchar(256) NOT NULL,
+    [PasswordHash] nvarchar(512) NOT NULL,
+    [Role] nvarchar(32) NOT NULL,
+    [IsActive] bit NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+    CONSTRAINT [PK_UserAccounts] PRIMARY KEY ([Id])
+);
+2026-05-14 11:48:25.711 +05:30 [INF]  Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Appointments] (
+    [Id] int NOT NULL IDENTITY,
+    [PatientId] int NOT NULL,
+    [SlotId] int NOT NULL,
+    [Status] int NOT NULL,
+    [BookedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+    CONSTRAINT [PK_Appointments] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Appointments_Slots_SlotId] FOREIGN KEY ([SlotId]) REFERENCES [Slots] ([Id]) ON DELETE NO ACTION,
+    CONSTRAINT [FK_Appointments_UserAccounts_PatientId] FOREIGN KEY ([PatientId]) REFERENCES [UserAccounts] ([Id]) ON DELETE NO ACTION
+);
+2026-05-14 11:48:25.719 +05:30 [INF]  Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Appointments_PatientId] ON [Appointments] ([PatientId]);
+2026-05-14 11:48:25.721 +05:30 [INF]  Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Appointments_SlotId] ON [Appointments] ([SlotId]);
+2026-05-14 11:48:25.725 +05:30 [INF]  Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX [IX_UserAccounts_Email] ON [UserAccounts] ([Email]);
+2026-05-14 11:48:25.727 +05:30 [INF]  Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20260514061800_UserAccountSlotAppointment', N'8.0.27');
