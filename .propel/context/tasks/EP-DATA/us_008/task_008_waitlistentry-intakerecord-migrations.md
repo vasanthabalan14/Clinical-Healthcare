@@ -139,11 +139,11 @@ dotnet ef database update --project src/ClinicalHealthcare.Infrastructure.SqlMig
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `WaitlistEntry` entity created and registered in `ApplicationDbContext`
-- [ ] **[AC-002]** Filtered partial unique index on `(PatientId) WHERE Status = 0` configured
-- [ ] **[AC-003]** `IntakeRecord` versioning: each PATCH creates new row; `IntakeGroupId` groups versions
-- [ ] **[AC-004]** Default query filter `r.IsLatest` on `IntakeRecord`; `IgnoreQueryFilters()` available
-- [ ] **[AC-005]** Migration created and applies cleanly
-- [ ] Two Active WaitlistEntry rows for same patient rejected at DB level
-- [ ] `IsLatest` flag managed by application before `SaveChanges`
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `WaitlistEntry` entity created and registered in `ApplicationDbContext`
+- [x] **[AC-002]** Filtered partial unique index on `(PatientId) WHERE Status = 0` configured
+- [x] **[AC-003]** `IntakeRecord` versioning: each PATCH creates new row; `IntakeGroupId` groups versions
+- [x] **[AC-004]** Default query filter `r.IsLatest` on `IntakeRecord`; `IgnoreQueryFilters()` available
+- [x] **[AC-005]** Migration created and applies cleanly
+- [x] Two Active WaitlistEntry rows for same patient rejected at DB level
+- [x] `IsLatest` flag managed by application before `SaveChanges`
+- [x] `dotnet build` passes with 0 errors

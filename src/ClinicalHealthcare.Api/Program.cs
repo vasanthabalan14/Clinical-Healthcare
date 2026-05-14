@@ -60,14 +60,16 @@ var postgresConnectionString  = RequireConnectionString("POSTGRES_CONNECTION_STR
 var redisConnectionString     = RequireConnectionString("REDIS_CONNECTION_STRING");
 
 // ── ApplicationDbContext — SQL Server (AC-001) ────────────────────────────
-// AppointmentFsmInterceptor is stateless — singleton lifetime is safe and avoids
-// per-request allocations. Registered here so future ctor injection is possible.
+// Interceptors are stateless singletons — safe and avoids per-request allocations.
 builder.Services.AddSingleton<AppointmentFsmInterceptor>();
+builder.Services.AddSingleton<WaitlistGuardInterceptor>();
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     options
         .UseSqlServer(sqlServerConnectionString,
             sql => sql.MigrationsAssembly("ClinicalHealthcare.Infrastructure.SqlMigrations"))
-        .AddInterceptors(sp.GetRequiredService<AppointmentFsmInterceptor>()));
+        .AddInterceptors(
+            sp.GetRequiredService<AppointmentFsmInterceptor>(),
+            sp.GetRequiredService<WaitlistGuardInterceptor>()));
 
 // ── ClinicalDbContext — PostgreSQL (AC-002) ───────────────────────────────
 builder.Services.AddDbContext<ClinicalDbContext>(options =>

@@ -4,6 +4,7 @@ using ClinicalHealthcare.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClinicalHealthcare.Infrastructure.SqlMigrations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514064109_WaitlistEntryIntakeRecord")]
+    partial class WaitlistEntryIntakeRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -209,9 +212,6 @@ namespace ClinicalHealthcare.Infrastructure.SqlMigrations.Migrations
                         .HasFilter("[Status] = 0");
 
                     b.HasIndex("PreferredSlotId");
-
-                    b.HasIndex("PatientId", "Status")
-                        .HasDatabaseName("IX_WaitlistEntries_PatientId_Status");
 
                     b.ToTable("WaitlistEntries");
                 });
