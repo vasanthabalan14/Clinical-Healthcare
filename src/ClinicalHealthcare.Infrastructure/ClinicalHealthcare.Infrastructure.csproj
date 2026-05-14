@@ -11,6 +11,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.*" />
     <PackageReference Include="Hangfire" Version="1.8.*" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.*" />
+    <PackageReference Include="MailKit" Version="4.16.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.*">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

@@ -144,6 +144,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 
 // ── Correlation ID propagation + Serilog request logging (AC-002) ───────────
 app.UseMiddleware<CorrelationIdMiddleware>();

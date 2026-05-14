@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
     <PackageReference Include="xunit" Version="2.*" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.*">
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ClinicalHealthcare.Infrastructure\ClinicalHealthcare.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\ClinicalHealthcare.Api\ClinicalHealthcare.Api.csproj" />
   </ItemGroup>
 
 </Project>

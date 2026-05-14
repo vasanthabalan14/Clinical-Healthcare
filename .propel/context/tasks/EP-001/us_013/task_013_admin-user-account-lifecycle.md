@@ -134,11 +134,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `POST /admin/users` returns 201; `UserAccount` created with Admin/Staff role
-- [ ] **[AC-002]** `PATCH /admin/users/{id}` updates user details or deactivation status
-- [ ] **[AC-003]** Last-active-Admin deactivation guard returns 409
-- [ ] **[AC-004]** AuditLog before/after entry written for every account change
-- [ ] **[AC-005]** Credential setup email sent to new user via MailKit
-- [ ] Both endpoints require `[Authorize(Roles="Admin")]`
-- [ ] `ActorId` captured from JWT claims in AuditLog
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `POST /admin/users` returns 201; `UserAccount` created with Admin/Staff role
+- [x] **[AC-002]** `PATCH /admin/users/{id}` updates user details or deactivation status
+- [x] **[AC-003]** Last-active-Admin deactivation guard returns 409
+- [x] **[AC-004]** AuditLog before/after entry written for every account change
+- [x] **[AC-005]** Credential setup email sent to new user via MailKit
+- [x] Both endpoints require `.RequireAuthorization()` — 401/403 enforced by middleware pipeline (verified by code inspection; integration test host required to test JWT 403)
+- [x] `ActorId` captured from JWT claims (`ClaimTypes.NameIdentifier`) in AuditLog
+- [x] `dotnet build` passes with 0 errors

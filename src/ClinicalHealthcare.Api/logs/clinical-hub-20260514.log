@@ -393,3 +393,30 @@ REVOKE UPDATE, DELETE ON [dbo].[AuditLogs] FROM [public];
 2026-05-14 14:24:42.288 +05:30 [INF]  Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
 VALUES (N'20260514085336_AuditLogPhiRetention', N'8.0.27');
+2026-05-14 17:13:20.347 +05:30 [WRN]  Entity 'UserAccount' has a global query filter defined and is the required end of a relationship with the entity 'Appointment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-05-14 17:13:21.033 +05:30 [WRN]  Entity 'UserAccount' has a global query filter defined and is the required end of a relationship with the entity 'Appointment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-05-14 17:20:16.396 +05:30 [WRN]  Entity 'UserAccount' has a global query filter defined and is the required end of a relationship with the entity 'Appointment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-05-14 17:20:16.964 +05:30 [INF]  Executed DbCommand (17ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-05-14 17:20:16.987 +05:30 [INF]  Executed DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2026-05-14 17:20:16.989 +05:30 [INF]  Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-05-14 17:20:16.990 +05:30 [INF]  Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2026-05-14 17:20:17.009 +05:30 [INF]  Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+2026-05-14 17:20:17.022 +05:30 [INF]  Applying migration '20260514114322_UserAccountRegistrationFields'.
+2026-05-14 17:20:17.072 +05:30 [INF]  Executed DbCommand (10ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [UserAccounts] ADD [FirstName] nvarchar(100) NOT NULL DEFAULT N'';
+2026-05-14 17:20:17.075 +05:30 [INF]  Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [UserAccounts] ADD [LastName] nvarchar(100) NOT NULL DEFAULT N'';
+2026-05-14 17:20:17.076 +05:30 [INF]  Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [UserAccounts] ADD [VerificationTokenExpiry] datetime2 NULL;
+2026-05-14 17:20:17.077 +05:30 [INF]  Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [UserAccounts] ADD [VerificationTokenHash] nvarchar(128) NULL;
+2026-05-14 17:20:17.078 +05:30 [INF]  Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20260514114322_UserAccountRegistrationFields', N'8.0.27');

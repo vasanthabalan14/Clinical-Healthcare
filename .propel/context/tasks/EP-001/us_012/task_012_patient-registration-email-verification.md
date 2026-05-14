@@ -140,11 +140,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `POST /auth/register` returns 201 on success
-- [ ] **[AC-002]** Email verification token generated, stored hashed, valid 24h; sent via MailKit
-- [ ] **[AC-003]** Duplicate email returns 409
-- [ ] **[AC-004]** Rate limit: 10/IP/hour; exceeding returns 429
-- [ ] **[AC-005]** `UserAccount` created with `Role=Patient`, `IsActive=false`
-- [ ] `GET /auth/verify-email` activates account on valid token
-- [ ] SMTP credentials from env vars only (no hardcoded values)
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `POST /auth/register` returns 201 on success
+- [x] **[AC-002]** Email verification token generated, stored hashed, valid 24h; sent via MailKit
+- [x] **[AC-003]** Duplicate email returns 409
+- [x] **[AC-004]** Rate limit: 10/IP/hour; exceeding returns 429 — wired via `RequireRateLimiting` middleware; verified by code inspection (unit tests cannot simulate the middleware pipeline)
+- [x] **[AC-005]** `UserAccount` created with `Role=Patient`, `IsActive=false`
+- [x] `GET /auth/verify-email` activates account on valid token
+- [x] SMTP credentials from env vars only (no hardcoded values)
+- [x] `dotnet build` passes with 0 errors

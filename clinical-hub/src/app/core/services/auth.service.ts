@@ -1,6 +1,20 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'access_token';
+
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+}
 
 export type UserRole = 'patient' | 'staff' | 'admin';
 
@@ -13,6 +27,8 @@ interface JwtPayload {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+
+  constructor(private http: HttpClient) {}
 
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
@@ -64,5 +80,16 @@ export class AuthService {
     const token = this.getToken();
     if (!token) { return false; }
     return !this.isTokenExpired(token);
+  }
+
+  getCurrentUserId(): string | null {
+    const token = this.getToken();
+    if (!token) { return null; }
+    const payload = this.decodeToken(token);
+    return payload?.['sub'] ?? null;
+  }
+
+  register(payload: RegisterPayload): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, payload);
   }
 }

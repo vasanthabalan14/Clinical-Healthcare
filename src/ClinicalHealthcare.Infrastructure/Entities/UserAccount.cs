@@ -20,6 +20,10 @@ public sealed class UserAccount
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    // ── Profile fields (TASK_012) ─────────────────────────────────────────────
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName  { get; set; } = string.Empty;
+
     // ── PHI retention (AC-002 / TASK_011) ────────────────────────────────────
 
     /// <summary>Soft-delete flag. True means the account is pending retention expiry.</summary>
@@ -30,4 +34,15 @@ public sealed class UserAccount
     /// Null until the account is soft-deleted.
     /// </summary>
     public DateTimeOffset? RetainUntil { get; set; }
+
+    // ── Email verification (AC-002 / TASK_012) ───────────────────────────────
+
+    /// <summary>
+    /// SHA-256 hash of the one-time email verification token.
+    /// Null after the token has been consumed or was never generated.
+    /// </summary>
+    public string? VerificationTokenHash { get; set; }
+
+    /// <summary>UTC expiry of the verification token (24 hours from generation).</summary>
+    public DateTime? VerificationTokenExpiry { get; set; }
 }

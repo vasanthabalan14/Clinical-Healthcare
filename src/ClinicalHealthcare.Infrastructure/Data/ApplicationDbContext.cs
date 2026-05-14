@@ -32,6 +32,8 @@ public class ApplicationDbContext : DbContext
             e.Property(u => u.PasswordHash).HasMaxLength(512).IsRequired();
             e.Property(u => u.Role).HasMaxLength(32).IsRequired();
             e.Property(u => u.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            e.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
+            e.Property(u => u.LastName).HasMaxLength(100).IsRequired();
 
             // AC-004 — unique index on Email
             e.HasIndex(u => u.Email).IsUnique().HasDatabaseName("IX_UserAccounts_Email");
@@ -126,8 +128,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<UserAccount>(e =>
         {
             e.Property(u => u.IsDeleted).HasDefaultValue(false);
-            e.Property(u => u.RetainUntil).IsRequired(false);
-            // Soft-delete filter — use .IgnoreQueryFilters() for admin/audit access.
+            e.Property(u => u.RetainUntil).IsRequired(false);            // Email verification fields
+            e.Property(u => u.VerificationTokenHash).HasMaxLength(128).IsRequired(false);
+            e.Property(u => u.VerificationTokenExpiry).IsRequired(false);            // Soft-delete filter — use .IgnoreQueryFilters() for admin/audit access.
             e.HasQueryFilter(u => !u.IsDeleted);
         });
 
