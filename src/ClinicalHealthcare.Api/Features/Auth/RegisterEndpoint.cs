@@ -61,6 +61,7 @@ public sealed class RegisterEndpoint : IEndpointDefinition
     public void MapEndpoints(IEndpointRouteBuilder app)
     {
         app.MapPost("/auth/register", HandleRegister)
+           .AllowAnonymous()
            .RequireRateLimiting(RegistrationRateLimitPolicy)
            .WithName("RegisterPatient")
            .WithTags("Auth")
@@ -70,6 +71,7 @@ public sealed class RegisterEndpoint : IEndpointDefinition
            .Produces(StatusCodes.Status429TooManyRequests);
 
         app.MapGet("/auth/verify-email", HandleVerifyEmail)
+           .AllowAnonymous()
            .WithName("VerifyEmail")
            .WithTags("Auth")
            .Produces(StatusCodes.Status200OK)

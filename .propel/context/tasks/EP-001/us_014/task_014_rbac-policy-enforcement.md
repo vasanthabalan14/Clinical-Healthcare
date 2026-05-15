@@ -131,11 +131,11 @@ dotnet test
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** Named policies (`AdminOnly`, `StaffOrAdmin`, `AnyAuthenticated`) registered
-- [ ] **[AC-002]** `RbacViolationHandler` writes AuditLog `RBAC-Violation` on 403
-- [ ] **[AC-003]** Admin-only endpoints return 403 for Staff and Patient JWTs
-- [ ] **[AC-004]** StaffOrAdmin endpoints return 403 for Patient JWTs
-- [ ] **[AC-005]** Convention test asserts every endpoint has `[Authorize]` or `[AllowAnonymous]`
-- [ ] `RbacViolationHandler` registered in DI
-- [ ] Convention test included in CI `dotnet test` step
-- [ ] `dotnet build` + `dotnet test` pass with 0 errors
+- [x] **[AC-001]** Named policies (`AdminOnly`, `StaffOrAdmin`, `AnyAuthenticated`) registered
+- [x] **[AC-002]** `RbacViolationHandler` writes AuditLog `RBAC-Violation` on 403
+- [x] **[AC-003]** Admin-only endpoints return 403 for Staff and Patient JWTs
+- [x] **[AC-004]** StaffOrAdmin endpoints return 403 for Patient JWTs
+- [x] **[AC-005]** Convention test asserts every endpoint has `[Authorize]` or `[AllowAnonymous]`
+- [x] `RbacViolationHandler` registered in DI
+- [x] Convention test included in CI `dotnet test` step
+- [x] `dotnet build` + `dotnet test` pass with 0 errors

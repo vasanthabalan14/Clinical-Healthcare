@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using System.Text.Json;
 using ClinicalHealthcare.Api.Abstractions;
+using ClinicalHealthcare.Api.Authorization;
 using ClinicalHealthcare.Api.Infrastructure;
 using ClinicalHealthcare.Api.Middleware;
 using ClinicalHealthcare.Infrastructure.Cache;
@@ -108,6 +109,16 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
+// ── RBAC named policies (AC-001) ─────────────────────────────────────────
+// Central registration; per-slice AddServices guards check GetPolicy("...") is null
+// so these definitions are always applied before the idempotent guards run.
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly",        p => p.RequireRole("admin"));
+    options.AddPolicy("StaffOrAdmin",     p => p.RequireRole("staff", "admin"));
+    options.AddPolicy("AnyAuthenticated", p => p.RequireAuthenticatedUser());
+});
+
 // ── Vertical-slice endpoint registration (AC-005) ──────────────────────────
 builder.Services.AddEndpointDefinitions(typeof(Program).Assembly, builder.Configuration);
 
@@ -146,6 +157,14 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();
+
+// ── RBAC violation audit middleware (AC-002) ──────────────────────────────
+// MUST be placed BEFORE UseAuthorization so InvokeAsync registers the
+// Response.OnStarting callback before the authorization middleware may
+// short-circuit with 403. If placed after, the middleware is never reached
+// on a 403 short-circuit and the audit entry is never written.
+app.UseMiddleware<RbacViolationHandler>();
+
 app.UseAuthorization();
 
 // ── Correlation ID propagation + Serilog request logging (AC-002) ───────────

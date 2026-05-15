@@ -6,6 +6,7 @@
     <Project Path="src/ClinicalHealthcare.Infrastructure/ClinicalHealthcare.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ClinicalHealthcare.Api.Tests/ClinicalHealthcare.Api.Tests.csproj" />
     <Project Path="tests/ClinicalHealthcare.Infrastructure.Tests/ClinicalHealthcare.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
