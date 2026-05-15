@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Text;
 using System.Text.Json;
 using ClinicalHealthcare.Api.Abstractions;
 using ClinicalHealthcare.Api.Authorization;
@@ -9,9 +10,11 @@ using ClinicalHealthcare.Infrastructure.Data;
 using ClinicalHealthcare.Infrastructure.Interceptors;
 using ClinicalHealthcare.Infrastructure.Logging;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using StackExchange.Redis;
 
@@ -109,6 +112,29 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
+// ── JWT bearer authentication (AC-001 / TASK_015) ──────────────────────────────
+// JWT_SECRET is required at startup; the JwtTokenService constructor enforces
+// the same invariant so the application will refuse to start if it is absent.
+var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
+    ?? throw new InvalidOperationException(
+        "Required environment variable 'JWT_SECRET' is not set. "
+        + "Set it before starting the application.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey        = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ValidateIssuer          = false,
+            ValidateAudience        = false,
+            // ClockSkew = Zero enforces the exact 15-minute TTL without a 5-minute grace window.
+            ClockSkew               = TimeSpan.Zero,
+        };
+    });
+
 // ── RBAC named policies (AC-001) ─────────────────────────────────────────
 // Central registration; per-slice AddServices guards check GetPolicy("...") is null
 // so these definitions are always applied before the idempotent guards run.
@@ -157,7 +183,11 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();
-
+// ── Session allowlist + TTL refresh (AC-002 / TASK_015) ────────────────────────
+// Must run AFTER UseAuthentication (context.User populated) and
+// BEFORE UseAuthorization (so invalid sessions are rejected with 401
+// before policy evaluation).
+app.UseMiddleware<SessionTtlMiddleware>();
 // ── RBAC violation audit middleware (AC-002) ──────────────────────────────
 // MUST be placed BEFORE UseAuthorization so InvokeAsync registers the
 // Response.OnStarting callback before the authorization middleware may

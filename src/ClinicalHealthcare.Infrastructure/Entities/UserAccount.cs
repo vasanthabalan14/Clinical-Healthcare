@@ -35,6 +35,14 @@ public sealed class UserAccount
     /// </summary>
     public DateTimeOffset? RetainUntil { get; set; }
 
+    // ── Login lockout (AC-005 / TASK_015) ─────────────────────────────────────
+
+    /// <summary>Running count of consecutive failed login attempts since last success.</summary>
+    public int FailedLoginAttempts { get; set; } = 0;
+
+    /// <summary>UTC instant until which this account is locked out. Null means not locked.</summary>
+    public DateTimeOffset? LockoutEnd { get; set; }
+
     // ── Email verification (AC-002 / TASK_012) ───────────────────────────────
 
     /// <summary>

@@ -71,7 +71,15 @@ export class ShellComponent {
   });
 
   signOut(): void {
-    this.auth.clearToken();
-    void this.router.navigate(['/login']);
+    // Call server logout to revoke the Redis allowlist entry (TASK_015 AC-004),
+    // then clear the local token and navigate to login.
+    this.auth.logout().subscribe({
+      next:  () => void this.router.navigate(['/login']),
+      error: () => {
+        // Even if the server call fails (Redis down), clear the local token.
+        this.auth.clearToken();
+        void this.router.navigate(['/login']);
+      }
+    });
   }
 }

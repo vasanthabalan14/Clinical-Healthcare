@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 const TOKEN_KEY = 'access_token';
@@ -14,6 +14,17 @@ export interface RegisterPayload {
 
 export interface RegisterResponse {
   message: string;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;
 }
 
 export type UserRole = 'patient' | 'staff' | 'admin';
@@ -91,5 +102,23 @@ export class AuthService {
 
   register(payload: RegisterPayload): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${environment.apiBaseUrl}/auth/register`, payload);
+  }
+
+  login(payload: LoginPayload): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/auth/login`, payload).pipe(
+      tap(res => this.setToken(res.accessToken))
+    );
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/logout`, {}).pipe(
+      tap(() => this.clearToken())
+    );
+  }
+
+  extendSession(): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiBaseUrl}/auth/extend-session`, {}).pipe(
+      tap(res => this.setToken(res.accessToken))
+    );
   }
 }
