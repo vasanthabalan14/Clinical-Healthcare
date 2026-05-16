@@ -46,7 +46,7 @@ public sealed class ResetPasswordEndpoint : IEndpointDefinition
 
     public sealed record ResetPasswordRequest(string Email, string Token, string NewPassword);
 
-    internal static async Task<IResult> HandleResetPassword(
+    public static async Task<IResult> HandleResetPassword(
         ResetPasswordRequest              request,
         ApplicationDbContext              db,
         IPasswordHasher<string>           hasher,
@@ -61,6 +61,10 @@ public sealed class ResetPasswordEndpoint : IEndpointDefinition
         {
             return Results.UnprocessableEntity(new { error = "Email, token, and newPassword are required." });
         }
+
+        // F2: password complexity — must match the 8-char rule enforced by RegisterEndpoint.
+        if (request.NewPassword.Length < 8)
+            return Results.UnprocessableEntity(new { error = "Password must be at least 8 characters." });
 
         var logger = loggerFactory.CreateLogger<ResetPasswordEndpoint>();
 

@@ -59,6 +59,8 @@ export class ResetPasswordComponent implements OnInit {
         this.loading.set(false);
         if (err.status === 400) {
           this.error.set('This reset link is invalid or has expired. Please request a new one.');
+        } else if (err.status === 422) {
+          this.error.set('Password must be at least 8 characters.');
         } else {
           this.error.set('Something went wrong. Please try again.');
         }

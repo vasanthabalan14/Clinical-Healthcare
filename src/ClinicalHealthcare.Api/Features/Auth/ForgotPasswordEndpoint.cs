@@ -44,11 +44,12 @@ public sealed class ForgotPasswordEndpoint : IEndpointDefinition
 
     public sealed record ForgotPasswordRequest(string Email);
 
-    internal static async Task<IResult> HandleForgotPassword(
+    public static async Task<IResult> HandleForgotPassword(
         ForgotPasswordRequest         request,
         ApplicationDbContext          db,
         [Microsoft.AspNetCore.Mvc.FromServices] IEmailService emailService,
         IConfiguration                configuration,
+        [Microsoft.AspNetCore.Mvc.FromServices] ILoggerFactory loggerFactory,
         CancellationToken             ct)
     {
         // AC-001: always 200 — do not short-circuit with an error for unknown emails.
@@ -66,15 +67,24 @@ public sealed class ForgotPasswordEndpoint : IEndpointDefinition
             return Results.Ok(new { message = "If that email is registered you will receive a reset link." });
         }
 
+        // F3: per-email cooldown — reject a new token request if one was issued in the last 5 minutes.
+        // Always return 200 (no enumeration).
+        if (account.PasswordResetTokenIssuedAt.HasValue
+            && account.PasswordResetTokenIssuedAt.Value > DateTime.UtcNow.AddMinutes(-5))
+        {
+            return Results.Ok(new { message = "If that email is registered you will receive a reset link." });
+        }
+
         // Generate token: 32 random bytes → base64url raw token for the link,
         // PBKDF2 SHA-256 hash stored in the database (AC-002).
         var rawTokenBytes = RandomNumberGenerator.GetBytes(32);
         var rawToken      = Convert.ToBase64String(rawTokenBytes)
             .Replace('+', '-').Replace('/', '_').TrimEnd('=');  // base64url safe
 
-        account.PasswordResetTokenHash   = ComputePbkdf2Hash(rawToken);
-        account.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(TokenExpiryMinutes);
-        account.PasswordResetTokenUsed   = false;
+        account.PasswordResetTokenHash      = ComputePbkdf2Hash(rawToken);
+        account.PasswordResetTokenExpiry    = DateTime.UtcNow.AddMinutes(TokenExpiryMinutes);
+        account.PasswordResetTokenUsed      = false;
+        account.PasswordResetTokenIssuedAt  = DateTime.UtcNow;  // F3: cooldown timestamp
 
         await db.SaveChangesAsync(ct);
 
@@ -83,11 +93,21 @@ public sealed class ForgotPasswordEndpoint : IEndpointDefinition
         var resetLink  = $"{baseUrl}/reset-password?email={Uri.EscapeDataString(account.Email)}&token={Uri.EscapeDataString(rawToken)}";
         var htmlBody   = BuildEmailHtml(account.FirstName, resetLink, TokenExpiryMinutes);
 
-        await emailService.SendAsync(
-            account.Email,
-            "Reset your ClinicalHub password",
-            htmlBody,
-            ct);
+        // P3: wrap email send so a transient SMTP failure returns 200 rather than 500.
+        try
+        {
+            await emailService.SendAsync(
+                account.Email,
+                "Reset your ClinicalHub password",
+                htmlBody,
+                ct);
+        }
+        catch (Exception ex)
+        {
+            // Token is already persisted — user can retry the flow. Log but do not expose error.
+            loggerFactory.CreateLogger<ForgotPasswordEndpoint>()
+                .LogWarning(ex, "ForgotPasswordEndpoint: failed to send reset email to {Email}.", account.Email);
+        }
 
         return Results.Ok(new { message = "If that email is registered you will receive a reset link." });
     }
@@ -98,7 +118,7 @@ public sealed class ForgotPasswordEndpoint : IEndpointDefinition
     /// Computes a PBKDF2 SHA-256 hash of <paramref name="rawToken"/>.
     /// Stored as hex so it is safe to persist as a VARCHAR column.
     /// </summary>
-    internal static string ComputePbkdf2Hash(string rawToken)
+    public static string ComputePbkdf2Hash(string rawToken)
     {
         // Salt is a fixed application-level salt derived from the token itself —
         // the token is already a high-entropy random value; a separate per-row

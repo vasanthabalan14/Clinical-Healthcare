@@ -64,4 +64,7 @@ public sealed class UserAccount
 
     /// <summary>True once the token has been consumed; prevents replay attacks (AC-005).</summary>
     public bool PasswordResetTokenUsed { get; set; } = false;
+
+    /// <summary>UTC instant the last reset token was issued. Used to enforce the 5-minute flood cooldown (F3).</summary>
+    public DateTime? PasswordResetTokenIssuedAt { get; set; }
 }
