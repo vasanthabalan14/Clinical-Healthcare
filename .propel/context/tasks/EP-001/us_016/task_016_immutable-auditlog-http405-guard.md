@@ -131,11 +131,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `GET /audit` returns paginated results (50/page) with total count
-- [ ] **[AC-002]** CSV export: sync ≤10k; Hangfire async >10k with 202 response
-- [ ] **[AC-003]** `DELETE /audit` and `PATCH /audit` return 405 and write AuditLog entry
-- [ ] **[AC-004]** No `Remove()` or `Update()` calls on `AuditLog` in application code
-- [ ] **[AC-005]** All `/audit` endpoints require `[Authorize(Roles="Admin")]`
-- [ ] Pagination includes `totalCount` and `pageCount` in response
-- [ ] `ExportAuditLogJob` Hangfire job class created
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `GET /audit` returns paginated results (50/page) with total count
+- [x] **[AC-002]** CSV export: sync ≤10k; Hangfire async >10k with 202 response
+- [x] **[AC-003]** `DELETE /audit` and `PATCH /audit` return 405 and write AuditLog entry
+- [x] **[AC-004]** No `Remove()` or `Update()` calls on `AuditLog` in application code
+- [x] **[AC-005]** All `/audit` endpoints require `[Authorize(Roles="Admin")]`
+- [x] Pagination includes `totalCount` and `pageCount` in response
+- [x] `ExportAuditLogJob` Hangfire job class created
+- [x] `dotnet build` passes with 0 errors

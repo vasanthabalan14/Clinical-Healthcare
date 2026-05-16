@@ -26,7 +26,9 @@ export const sessionInterceptor: HttpInterceptorFn = (
   // Skip public endpoints that do not carry a token to avoid loops.
   const isPublic = req.url.includes('/auth/login')
     || req.url.includes('/auth/register')
-    || req.url.includes('/auth/extend-session');
+    || req.url.includes('/auth/extend-session')
+    || req.url.includes('/auth/forgot-password')
+    || req.url.includes('/auth/reset-password');
 
   const token = auth.getToken();
 

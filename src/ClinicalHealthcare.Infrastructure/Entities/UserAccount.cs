@@ -53,4 +53,15 @@ public sealed class UserAccount
 
     /// <summary>UTC expiry of the verification token (24 hours from generation).</summary>
     public DateTime? VerificationTokenExpiry { get; set; }
+
+    // ── Password reset (AC-002 / TASK_017) ───────────────────────────────────
+
+    /// <summary>PBKDF2 SHA-256 hash of the one-time password-reset token. Null when no reset is pending.</summary>
+    public string? PasswordResetTokenHash { get; set; }
+
+    /// <summary>UTC instant at which the reset token expires (60 minutes from generation). Null when none pending.</summary>
+    public DateTime? PasswordResetTokenExpiry { get; set; }
+
+    /// <summary>True once the token has been consumed; prevents replay attacks (AC-005).</summary>
+    public bool PasswordResetTokenUsed { get; set; } = false;
 }

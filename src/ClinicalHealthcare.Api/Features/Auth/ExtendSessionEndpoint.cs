@@ -68,6 +68,14 @@ public sealed class ExtendSessionEndpoint : IEndpointDefinition
                 TimeSpan.FromSeconds(JwtTokenService.TokenExpirySeconds)).ConfigureAwait(false);
 
             await db.KeyDeleteAsync($"{LoginEndpoint.SessionKeyPrefix}{oldJti}").ConfigureAwait(false);
+
+            // TASK_017 (AC-004): rotate the JTI in the user-sessions set so the
+            // bulk-revocation at password-reset always sees the current active JTI.
+            var userSessionsKey = $"{ResetPasswordEndpoint.UserSessionsKeyPrefix}{userId}";
+            await db.SetRemoveAsync(userSessionsKey, oldJti).ConfigureAwait(false);
+            await db.SetAddAsync(userSessionsKey, newJti).ConfigureAwait(false);
+            await db.KeyExpireAsync(userSessionsKey,
+                TimeSpan.FromSeconds(JwtTokenService.TokenExpirySeconds)).ConfigureAwait(false);
         }
         catch (RedisException ex)
         {

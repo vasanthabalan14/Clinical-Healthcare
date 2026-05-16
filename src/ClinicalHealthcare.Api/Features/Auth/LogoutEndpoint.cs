@@ -48,6 +48,17 @@ public sealed class LogoutEndpoint : IEndpointDefinition
         {
             var db = multiplexer.GetDatabase();
             await db.KeyDeleteAsync($"{LoginEndpoint.SessionKeyPrefix}{jti}").ConfigureAwait(false);
+
+            // TASK_017 (AC-004): remove this JTI from the user-sessions set so that
+            // a subsequent password-reset revocation does not try to delete an already-gone key.
+            var userIdStr = httpContext.User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value
+                         ?? httpContext.User.FindFirst("sub")?.Value;
+            if (int.TryParse(userIdStr, out var userId))
+            {
+                await db.SetRemoveAsync(
+                    $"{ResetPasswordEndpoint.UserSessionsKeyPrefix}{userId}",
+                    jti).ConfigureAwait(false);
+            }
         }
         catch (RedisException ex)
         {

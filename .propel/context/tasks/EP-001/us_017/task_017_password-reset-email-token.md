@@ -136,11 +136,11 @@ dotnet build
 
 ## Implementation Checklist
 
-- [ ] **[AC-001]** `POST /auth/forgot-password` always returns 200 regardless of email existence
-- [ ] **[AC-002]** Reset token valid 60 min; stored as PBKDF2 SHA-256 hash
-- [ ] **[AC-003]** `POST /auth/reset-password` validates token; re-hashes password with 100k iterations
-- [ ] **[AC-004]** All Redis sessions for user revoked on successful reset
-- [ ] **[AC-005]** Reset token marked `Used=true` immediately after successful reset (single-use)
-- [ ] User-sessions Redis set (`user-sessions:{userId}`) maintained for bulk revocation
-- [ ] `SMTP_*` env vars used for email (no hardcoded credentials)
-- [ ] `dotnet build` passes with 0 errors
+- [x] **[AC-001]** `POST /auth/forgot-password` always returns 200 regardless of email existence
+- [x] **[AC-002]** Reset token valid 60 min; stored as PBKDF2 SHA-256 hash
+- [x] **[AC-003]** `POST /auth/reset-password` validates token; re-hashes password with 100k iterations
+- [x] **[AC-004]** All Redis sessions for user revoked on successful reset
+- [x] **[AC-005]** Reset token marked `Used=true` immediately after successful reset (single-use)
+- [x] User-sessions Redis set (`user-sessions:{userId}`) maintained for bulk revocation
+- [x] `SMTP_*` env vars used for email (no hardcoded credentials)
+- [x] `dotnet build` passes with 0 errors

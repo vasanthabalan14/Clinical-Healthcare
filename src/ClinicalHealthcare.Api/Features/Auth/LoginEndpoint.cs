@@ -127,6 +127,17 @@ public sealed class LoginEndpoint : IEndpointDefinition
                 $"{SessionKeyPrefix}{jti}",
                 account.Id.ToString(),
                 TimeSpan.FromSeconds(JwtTokenService.TokenExpirySeconds)).ConfigureAwait(false);
+
+            // TASK_017 (AC-004): maintain a per-user set of active JTIs so that
+            // ResetPasswordEndpoint can revoke all sessions in one Redis operation.
+            await redisDb.SetAddAsync(
+                $"{ResetPasswordEndpoint.UserSessionsKeyPrefix}{account.Id}",
+                jti).ConfigureAwait(false);
+
+            // TTL on the set matches the token TTL to prevent unbounded growth.
+            await redisDb.KeyExpireAsync(
+                $"{ResetPasswordEndpoint.UserSessionsKeyPrefix}{account.Id}",
+                TimeSpan.FromSeconds(JwtTokenService.TokenExpirySeconds)).ConfigureAwait(false);
         }
         catch (RedisException ex)
         {

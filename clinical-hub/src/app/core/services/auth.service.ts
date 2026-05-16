@@ -121,4 +121,16 @@ export class AuthService {
       tap(res => this.setToken(res.accessToken))
     );
   }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiBaseUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, token: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiBaseUrl}/auth/reset-password`, {
+      email,
+      token,
+      newPassword
+    });
+  }
 }
